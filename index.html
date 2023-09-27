@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Pacman Demo</title>
+</head>
+
+<body>
+    <div id="container">
+        <div id="world"></div>
+        <div id="pacman"></div>
+        <div id="pacman2"></div>
+        <div id="score">0</div>
+        <div id="lives">3</div>
+    </div>
+
+    List of features to build
+    1) have JS display world of brick/coin/etc
+    2) have the pacman move up and down
+    <script>
+        var world = [
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 0, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0, 2],
+            [2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2],
+            [2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2],
+            [2, 1, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 1, 2],
+            [2, 1, 1, 3, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2],
+            [2, 1, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 3, 2, 2, 1, 2],
+            [2, 1, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 3, 1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2],
+            [2, 1, 2, 1, 1, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 3, 1, 1, 2, 1, 1, 1, 1, 2],
+            [2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 3, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        ];
+        var score = 0;
+        var lives = 3;
+        var pacman = {
+            x: 1,
+            y: 1,
+            icon : 'pacman'
+        }
+        var pacman2 = {
+            x: 23,
+            y: 1,
+            icon : 'pacman2'
+        }
+        
+        function displayWorld() {
+            var output = '';
+
+            for (var i = 0; i < world.length; i++) {
+                output += "\n<div class='row'>\n";
+                for (var j = 0; j < world[i].length; j++) {
+                    if (world[i][j] == 2) {
+                        output += "<div class='brick'></div>";
+                    } else if (world[i][j] == 1) {
+                        output += "<div class='coin'></div>";
+                    } else if (world[i][j] == 3) {
+                        output += "<div class='cherry'></div>";
+                    }
+                    else if (world[i][j] == 4) {
+                        output += "<div class='ghost'></div>";
+                    }
+                    else if (world[i][j] == 0) {
+                        output += "<div class='empty'></div>";
+                    }
+                }
+                output += "\n</div>";
+
+            }
+            // console.log(output);
+            document.getElementById('world').innerHTML = output;
+        }
+        function displayPacman(character) {
+            var iconElement = document.getElementById(character.icon);
+            iconElement.style.top = character.y * 20 + "px";
+            iconElement.style.left = character.x * 20 + "px";
+        }
+        function displayScore() {
+            document.getElementById('score').innerHTML = score;
+        }
+        function displayLives() {
+            document.getElementById('lives').innerHTML = lives;
+        }
+        
+        function rotatePacman(character, key){
+            var iconElement = document.getElementById(character.icon);
+            var rotation = 0
+            if(key == 37 || key == 65){
+                rotation = 180;
+            }else if(key == 39 || key == 68 ){
+                rotation = 0;
+            }else if(key == 40 || key == 83 ){
+                rotation = 90;
+            }else if(key == 38 || key == 87 ){
+                rotation = 270;
+            }
+            iconElement.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        displayWorld();
+        displayPacman(pacman);
+        displayPacman(pacman2);
+        displayScore();
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 37 && world[pacman.y][pacman.x - 1] != 2) {
+                pacman.x--;
+            }
+            if (e.keyCode == 39 && world[pacman.y][pacman.x + 1] != 2) {
+                pacman.x++;
+            }
+            if (e.keyCode == 40 && world[pacman.y + 1][pacman.x] != 2) {
+                pacman.y++;
+            }
+            if (e.keyCode == 38 && world[pacman.y - 1][pacman.x] != 2) {
+                pacman.y--;
+            }
+            if (e.keyCode == 65 && world[pacman2.y][pacman2.x - 1] != 2) {
+                pacman2.x--;
+            }
+            if (e.keyCode == 68 && world[pacman2.y][pacman2.x + 1] != 2) {
+                pacman2.x++;
+            }
+            if (e.keyCode == 83 && world[pacman2.y + 1][pacman2.x] != 2) {
+                pacman2.y++;
+            }
+            if (e.keyCode == 87 && world[pacman2.y - 1][pacman2.x] != 2) {
+                pacman2.y--;
+            }
+            if (world[pacman.y][pacman.x] == 1 || world[pacman2.y][pacman2.x] == 1) {
+                world[pacman.y][pacman.x] = 0;
+                world[pacman2.y][pacman2.x] = 0;
+                score += 10;
+            }
+            if (world[pacman.y][pacman.x] == 3 || world[pacman2.y][pacman2.x] == 3) {
+                world[pacman.y][pacman.x] = 0;
+                world[pacman2.y][pacman2.x] = 0;
+                score += 50;
+            }
+            if (world[pacman.y][pacman.x] == 4 || world[pacman2.y][pacman2.x] == 4) {
+                score = 0;
+                lives--;
+                displayLives();
+
+            }
+            rotatePacman(pacman, e.keyCode);
+            rotatePacman(pacman2, e.keyCode);
+            displayWorld();
+            displayScore();
+            displayPacman(pacman);
+            displayPacman(pacman2);
+        }
+
+    </script>
+</body>
+
+</html>
